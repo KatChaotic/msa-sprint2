@@ -1,0 +1,41 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь")
+
+System_Boundary(hotelio, "Hotelio") {
+    Container(frontend, "Frontend", "", "Предоставляет интерфейс пользователю")
+
+    Container(bff, "Back For Frontend", "", "Роутинг запросов на микросервисы")
+
+    Container(users_service, "Users Service", "", "Валидация пользователей")
+    Container(hotels_service, "Hotels Service", "", "Управление информацией об отелях")
+    Container(review_service, "Review Service", "", "Управление отзывами об отеле")
+    Container(promo_service, "Promo Service", "", "Сервис промокодов")
+    Container(booking_service, "Booking Service", "", "Сервис бронирования")
+
+    ContainerQueue(event_bus, "Шина событий", "kafka", "Обмен событиями")
+}
+
+Rel(user, frontend, "Взаимодействует")
+
+Rel(frontend, bff, "Использует", "Rest, GraphQL, SSE")
+Rel(event_bus, bff, "События")
+
+Rel(bff, users_service, "Использует", "Rest")
+Rel(bff, hotels_service, "Использует", "Rest")
+Rel(bff, review_service, "Использует", "Rest")
+Rel(bff, promo_service, "Использует", "Rest")
+Rel(bff, booking_service, "Использует", "Rest")
+
+BiRel(booking_service, event_bus, "События")
+
+BiRel(promo_service, event_bus, "События")
+
+Rel(promo_service, users_service, "Использует")
+Rel(booking_service, hotels_service, "Использует")
+Rel(booking_service, review_service, "Использует")
+Rel(booking_service, users_service, "Использует")
+
+@enduml

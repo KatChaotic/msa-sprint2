@@ -1,0 +1,78 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Sequence.puml
+
+Container_Ext(bff, "Back For Frontend")
+
+Container_Boundary(booking_service, "Booking Service")
+  Component(BookingAPI, "BookingApi", "", "Предоставляет данные о бронировании")
+
+  ComponentDb(BookingDB, "BookingDB", "PostgresSQL", "Хранение данных бронирования")
+
+  Component(BookingProcessorService, "BookingProcessorService", "", "Обрабатывает заявку на бронирование")
+Boundary_End()
+
+ComponentQueue_Ext(event_bus, "Шина Событий")
+
+Container_Ext(users_service, "Users Service")
+Container_Ext(review_service, "Review Service")
+Container_Ext(hotels_service, "Hotels Service")
+Container_Ext(promo_service, "Promo Service")
+
+Rel(bff, BookingAPI, "Запрос о бронировании", "Rest")
+
+activate BookingAPI
+
+Rel(BookingAPI, BookingDB, "Сохранение бронирования")
+Rel(BookingAPI, event_bus, "Задача бронирования")
+
+deactivate BookingAPI
+
+Rel(event_bus, BookingProcessorService, "Задача бронирования", $rel=-->)
+
+activate BookingProcessorService
+
+Rel(BookingProcessorService, users_service, "Пользователь валиден?", "Rest")
+activate users_service
+Rel(users_service, BookingProcessorService, "Ответ о статусе пользователя", "Rest", $rel=-->)
+deactivate users_service
+
+Rel(BookingProcessorService, hotels_service, "Отель валиден?", "Rest")
+activate hotels_service
+Rel(hotels_service, BookingProcessorService, "Ответ о статусе отеля", "Rest", $rel=-->)
+deactivate hotels_service
+
+Rel(BookingProcessorService, review_service, "Отель надежен?", "Rest")
+activate review_service
+Rel(review_service, BookingProcessorService, "Ответ о надежности отеля", "Rest", $rel=-->)
+deactivate review_service
+
+Rel(BookingProcessorService, event_bus, "Промокод использован")
+Rel(event_bus, promo_service, "Промокод использован, блокировка промокода")
+
+activate promo_service
+Rel(promo_service, event_bus, "Расчет скидки", $rel=-->)
+deactivate promo_service
+
+Rel(event_bus, BookingProcessorService, "Расчет скидки", $rel=-->)
+
+alt Успешное подтверждение
+
+Rel(BookingProcessorService, BookingDB, "Подтверждение бронирования")
+Rel(BookingProcessorService, event_bus, "Подтверждение бронирования")
+
+Rel(event_bus, bff, "Подтверждение бронирования", $rel=-->)
+
+else Неуспешное подтверждение
+
+Rel(BookingProcessorService, BookingDB, "Отмена бронирования")
+Rel(BookingProcessorService, event_bus, "Отмена бронирования")
+
+Rel(event_bus, promo_service, "Отмена бронирования, снятие блокировки промокода")
+
+Rel(event_bus, bff, "Отмена бронирования", $rel=-->)
+
+end
+
+deactivate BookingProcessorService
+
+@enduml
