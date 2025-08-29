@@ -7,7 +7,7 @@ async function bootstrap() {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
         transport: Transport.GRPC,
         options: {
-            package: 'booking-service',
+            package: 'booking',
             protoPath: path.resolve(__dirname, './proto/booking.proto'),
         },
     });
