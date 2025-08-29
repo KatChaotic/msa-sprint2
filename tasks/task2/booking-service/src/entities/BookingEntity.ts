@@ -12,7 +12,7 @@ export class BookingEntity {
     public hotelId: string;
 
     @Column()
-    public promoCode: string;
+    public promoCode?: string;
 
     @Column()
     public discountPercent: number;

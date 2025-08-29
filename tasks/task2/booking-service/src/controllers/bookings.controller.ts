@@ -3,7 +3,8 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { BookingEntity } from 'src/entities/BookingEntity';
 import type { BookingListRequest } from 'src/models/BookingListRequest';
 import type { BookingListResponse } from 'src/models/BookingListResponse';
-import { BookingResponse } from 'src/models/BookingResponse';
+import type { BookingRequest } from 'src/models/BookingRequest';
+import type { BookingResponse } from 'src/models/BookingResponse';
 import { BookingService } from 'src/services/booking.service';
 
 function mapEntityToBookingResponse(booking: BookingEntity): BookingResponse {
@@ -24,10 +25,20 @@ export class BookingsController {
 
     @GrpcMethod('BookingService', 'ListBookings')
     async getListBookings(request: BookingListRequest): Promise<BookingListResponse> {
-        const bookingEntities = await this.bookingService.findByUserId(request.user_id);
+        const bookingEntities = await this.bookingService.findByUserId(request.userId);
 
         return {
             bookings: bookingEntities.map(mapEntityToBookingResponse),
         };
+    }
+
+    @GrpcMethod('BookingService', 'CreateBooking')
+    async createBooking(request: BookingRequest): Promise<BookingResponse | null> {
+        const result = await this.bookingService.createBooking(request.userId, request.hotelId, request.promoCode);
+        if (!result) {
+            return null;
+        }
+
+        return mapEntityToBookingResponse(result);
     }
 }

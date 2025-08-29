@@ -2,7 +2,7 @@ export interface BookingResponse {
     id: string;
     user_id: string;
     hotel_id: string;
-    promo_code: string;
+    promo_code?: string;
     discount_percent: number;
     price: number;
     /**

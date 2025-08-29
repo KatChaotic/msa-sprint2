@@ -4,7 +4,7 @@ import { BookingsController } from './controllers/bookings.controller';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true }), BookingModule],
+    imports: [ConfigModule.forRoot({ isGlobal: true, expandVariables: true }), BookingModule],
     controllers: [BookingsController],
 })
 export class AppModule {}
