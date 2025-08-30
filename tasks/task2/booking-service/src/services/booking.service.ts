@@ -6,6 +6,7 @@ import { ReviewsService } from './reviews.service';
 import { PromoService } from './promo.service';
 import { HotelsService } from './hotels.service';
 import { PromoApiModel } from 'src/models/PromoApiModel';
+import { EventBusService } from './eventBus.service';
 
 const HOTEL_BASE_PRICE = 100.0;
 const HOTEL_VIP_USER_DISCOUNT_PERCENT = 0.2;
@@ -19,6 +20,7 @@ export class BookingService {
         private readonly hotelsService: HotelsService,
         private readonly reviewsService: ReviewsService,
         private readonly promoService: PromoService,
+        private readonly eventBusService: EventBusService,
     ) {}
 
     async findAll(): Promise<BookingEntity[]> {
@@ -63,6 +65,15 @@ export class BookingService {
         entity.discountPercent = discount;
 
         await this.bookingRepository.insert(entity);
+
+        await this.eventBusService.bookingCreated({
+            id: entity.id,
+            userId: entity.userId,
+            hotelId: entity.hotelId,
+            promoCode: entity.promoCode,
+            discountPercent: entity.discountPercent,
+            price: entity.price,
+        });
 
         return entity;
     }

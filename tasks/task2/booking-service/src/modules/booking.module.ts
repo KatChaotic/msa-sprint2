@@ -6,9 +6,17 @@ import { UsersModule } from './users.module';
 import { HotelsModule } from './hotels.module';
 import { ReviewsModule } from './reviews.module';
 import { PromoModule } from './promo.module';
+import { EventBusModule } from './eventBus.module';
 
 @Module({
-    imports: [DatabaseModule, UsersModule, HotelsModule, ReviewsModule, PromoModule],
+    imports: [
+        DatabaseModule,
+        UsersModule,
+        HotelsModule,
+        ReviewsModule,
+        PromoModule,
+        EventBusModule,
+    ],
     providers: [...bookingProviders, BookingService],
     exports: [BookingService],
 })

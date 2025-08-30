@@ -9,6 +9,7 @@ async function bootstrap() {
         options: {
             package: 'booking',
             protoPath: path.resolve(__dirname, './proto/booking.proto'),
+            url: '0.0.0.0:5000',
         },
     });
 
