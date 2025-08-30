@@ -1,12 +1,12 @@
 export interface BookingResponse {
     id: string;
-    user_id: string;
-    hotel_id: string;
-    promo_code?: string;
-    discount_percent: number;
+    userId: string;
+    hotelId: string;
+    promoCode?: string;
+    discountPercent: number;
     price: number;
     /**
      * ISO-8601
      */
-    created_at: string;
+    createdAt: string;
 }

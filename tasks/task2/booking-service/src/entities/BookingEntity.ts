@@ -1,25 +1,25 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'booking' })
 export class BookingEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn('increment', { type: 'bigint' })
     public id: string;
 
-    @Column()
+    @Column({ name: 'user_id' })
     public userId: string;
 
-    @Column()
+    @Column({ name: 'hotel_id' })
     public hotelId: string;
 
-    @Column()
+    @Column({ name: 'promo_code', nullable: true })
     public promoCode?: string;
 
-    @Column()
+    @Column({ name: 'discount_percent' })
     public discountPercent: number;
 
-    @Column()
+    @Column({ name: 'price' })
     public price: number;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at' })
     public createdAt: Date;
 }

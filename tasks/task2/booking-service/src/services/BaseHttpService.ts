@@ -16,4 +16,17 @@ export abstract class BaseApiClientService {
 
         return response.data;
     }
+
+    protected async postRequest<TResult, TPayload = object>(
+        path: string,
+        data?: TPayload,
+    ): Promise<TResult> {
+        const endpoint = this.configService.getOrThrow<string>(this.endpointConfigKey);
+
+        const response = await firstValueFrom(
+            this.httpService.post<TResult>(`${endpoint}${path}`, data),
+        );
+
+        return response.data;
+    }
 }

@@ -4,3 +4,8 @@ export interface PromoApiModel {
     active: boolean;
     vipOnly: boolean;
 }
+
+export interface PromoValidatePayload {
+    code: string;
+    userId: string;
+}

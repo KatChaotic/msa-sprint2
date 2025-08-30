@@ -10,12 +10,12 @@ import { BookingService } from 'src/services/booking.service';
 function mapEntityToBookingResponse(booking: BookingEntity): BookingResponse {
     return {
         id: booking.id,
-        user_id: booking.userId,
-        hotel_id: booking.hotelId,
-        promo_code: booking.promoCode,
-        discount_percent: booking.discountPercent,
+        userId: booking.userId,
+        hotelId: booking.hotelId,
+        promoCode: booking.promoCode,
+        discountPercent: booking.discountPercent,
         price: booking.price,
-        created_at: booking.createdAt.toISOString(),
+        createdAt: booking.createdAt.toISOString(),
     };
 }
 
@@ -25,7 +25,11 @@ export class BookingsController {
 
     @GrpcMethod('BookingService', 'ListBookings')
     async getListBookings(request: BookingListRequest): Promise<BookingListResponse> {
+        console.log(request);
+
         const bookingEntities = await this.bookingService.findByUserId(request.userId);
+
+        console.log(bookingEntities);
 
         return {
             bookings: bookingEntities.map(mapEntityToBookingResponse),
@@ -34,7 +38,11 @@ export class BookingsController {
 
     @GrpcMethod('BookingService', 'CreateBooking')
     async createBooking(request: BookingRequest): Promise<BookingResponse | null> {
-        const result = await this.bookingService.createBooking(request.userId, request.hotelId, request.promoCode);
+        const result = await this.bookingService.createBooking(
+            request.userId,
+            request.hotelId,
+            request.promoCode,
+        );
         if (!result) {
             return null;
         }
