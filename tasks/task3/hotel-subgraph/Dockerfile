@@ -2,9 +2,13 @@ FROM node:18
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+RUN npm install -g corepack
+
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN yarn install
 
 COPY . .
+
+EXPOSE 4002
 
 CMD ["node", "index.js"]
