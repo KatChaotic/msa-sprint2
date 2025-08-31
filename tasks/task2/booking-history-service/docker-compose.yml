@@ -1,36 +1,33 @@
 services:
-  booking-service:
+  booking-history-service:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: hotelio-booking-service
-    ports:
-      - "127.0.0.1:5000:5000"
+    container_name: hotelio-booking-history-service
     environment:
       KAFKA_BROKERS: kafka:9092
-      DB_HOST: booking-db
+      DB_HOST: booking-history-db
       DB_PORT: 5432
-      MONOLITH_API_URL: http://monolith:8080
     depends_on:
       - kafka
     networks:
       - hotelio-net
-  booking-db:
+  booking-history-db:
     image: postgres:15
-    container_name: hotelio-booking-db
+    container_name: hotelio-booking-history-db
     environment:
       POSTGRES_USER: hotelio
       POSTGRES_PASSWORD: hotelio
-      POSTGRES_DB: hotelio-booking
+      POSTGRES_DB: hotelio-booking-history
     ports:
-      - 5433:5432
+      - 5434:5432
     volumes:
-      - booking-db-data:/var/lib/postgresql/data
+      - booking-history-db-data:/var/lib/postgresql/data
     networks:
       - hotelio-net
 
 volumes:
-  booking-db-data:
+  booking-history-db-data:
 
 networks:
   hotelio-net:

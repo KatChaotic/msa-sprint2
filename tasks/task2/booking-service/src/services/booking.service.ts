@@ -52,7 +52,7 @@ export class BookingService {
             this.evaluateDiscountPercent(promoCode, userId),
         ]);
 
-        const finalPrice = basePrice * (1 - discount);
+        const finalPrice = basePrice * (1 - discount * 0.01);
         console.log(
             `Final price calculated: base=${basePrice}, discount=${discount}, final=${finalPrice}`,
         );
@@ -73,6 +73,7 @@ export class BookingService {
             promoCode: entity.promoCode,
             discountPercent: entity.discountPercent,
             price: entity.price,
+            createdAt: entity.createdAt.toISOString(),
         });
 
         return entity;
@@ -162,7 +163,7 @@ export class BookingService {
             return 0.0;
         }
 
-        const discount = promo.discountPercent * 0.01;
+        const discount = promo.discount;
 
         console.debug(`Promo code '${promoCode}' applied with discount ${discount}`);
         return discount;

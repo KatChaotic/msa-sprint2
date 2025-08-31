@@ -25,11 +25,7 @@ export class BookingsController {
 
     @GrpcMethod('BookingService', 'ListBookings')
     async getListBookings(request: BookingListRequest): Promise<BookingListResponse> {
-        console.log(request);
-
         const bookingEntities = await this.bookingService.findByUserId(request.userId);
-
-        console.log(bookingEntities);
 
         return {
             bookings: bookingEntities.map(mapEntityToBookingResponse),

@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
+import qs from 'query-string';
 
 export abstract class BaseApiClientService {
     constructor(
@@ -24,7 +25,10 @@ export abstract class BaseApiClientService {
         const endpoint = this.configService.getOrThrow<string>(this.endpointConfigKey);
 
         const response = await firstValueFrom(
-            this.httpService.post<TResult>(`${endpoint}${path}`, data),
+            this.httpService.post<TResult>(
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                `${endpoint}${path}?${qs.stringify(data as any)}`,
+            ),
         );
 
         return response.data;

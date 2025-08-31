@@ -1,5 +1,6 @@
 include:
   - ./booking-service/docker-compose.yml
+  - ./booking-history-service/docker-compose.yml
 
 services:
   monolith:
@@ -35,11 +36,16 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.2.1
     ports:
-      - "127.0.0.1:9092:9092"
+      - 29092:29092
+      - 9092:9092
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      # Разрешаем внешние подключения с хоста для упрощения разработки и тестирования
+      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL_SAME_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - hotelio-net
@@ -50,20 +56,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - hotelio-net
-  kafka-magic:
-    image: digitsy/kafka-magic
-    ports:
-      - "8080:80"
-    environment:
-      KMAGIC_ALLOW_TOPIC_DELETE: "true"
-      KMAGIC_ALLOW_SCHEMA_DELETE: "true"
-      KMAGIC_CONFIG_STORE_TYPE: "file"
-      KMAGIC_CONFIG_STORE_CONNECTION: "Data Source=/config/KafkaMagicConfig.db;"
-      KMAGIC_CONFIG_ENCRYPTION_KEY: "dab#&^*%%$wjbhra92834891yfaf783g!@#"
-    volumes:
-      - .:/config
     networks:
       - hotelio-net
 

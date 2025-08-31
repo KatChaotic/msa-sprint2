@@ -1,8 +1,10 @@
 export interface PromoApiModel {
     code: string;
-    discountPercent: number;
-    active: boolean;
+    discount: number;
     vipOnly: boolean;
+    expired: boolean;
+    validUntil: string;
+    description: string;
 }
 
 export interface PromoValidatePayload {

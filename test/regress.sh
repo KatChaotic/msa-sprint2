@@ -139,3 +139,11 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${BASE}/api/bookings?userId=test
   && pass "Отклонено: отель полностью забронирован" \
   || fail "Ошибка: сервер принял бронирование в полностью занятом отеле"
 echo "✅ Все HTTP-тесты пройдены!"
+
+echo "🧪 Выполнение SQL-тестов..."
+PGPASSWORD="${BOOKING_DB_PASSWORD}" psql -h "${BOOKING_DB_HOST}" -p "${BOOKING_DB_PORT}" -U "${BOOKING_DB_USER}" "${BOOKING_DB_NAME}" -c 'SELECT * FROM booking' && pass "Список бронирований получен" || fail "Список бронирований из базы не получен"
+
+PGPASSWORD="${BOOKING_HISTORY_DB_PASSWORD}" psql -h "${BOOKING_HISTORY_DB_HOST}" -p "${BOOKING_HISTORY_DB_PORT}" -U "${BOOKING_HISTORY_DB_USER}" "${BOOKING_HISTORY_DB_NAME}" -c 'SELECT * FROM booking' && pass "Список бронирований из истории получен" || fail "Список бронирований из базы историй не получен"
+
+echo "✅ Все SQL-тесты пройдены!"
+

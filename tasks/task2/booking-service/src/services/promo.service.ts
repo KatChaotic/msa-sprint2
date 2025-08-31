@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { PromoApiModel, PromoValidatePayload } from 'src/models/PromoApiModel';
 
-const PROMO_SERVICE_URL_CONFIG_KEY = 'PROMO_SERVICE_URL';
+const PROMO_SERVICE_URL_CONFIG_KEY = 'PROMO_SERVICE_API_URL';
 
 @Injectable()
 export class PromoService extends BaseApiClientService {
