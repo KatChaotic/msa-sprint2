@@ -1,0 +1,64 @@
+stages:
+  - build
+  - test
+  - deploy
+  - tag
+
+variables:
+  APP_NAME: booking-service
+  IMAGE_TAG: latest
+  IMAGE_NAME: booking-service
+  IMAGE_DEPLOY_TAG: $CI_PIPELINE_ID
+
+build:
+  # Не работает на windows вместе с gitlab-ci-local
+  # image: docker:dind
+  stage: build
+  script:
+    - echo "Building $IMAGE_NAME:$IMAGE_TAG with tag ($IMAGE_DEPLOY_TAG)"
+    - docker build -t $IMAGE_NAME:$IMAGE_DEPLOY_TAG ./booking-service
+    - docker tag $IMAGE_NAME:$IMAGE_DEPLOY_TAG $IMAGE_NAME:$IMAGE_TAG
+
+test:
+  stage: test
+  before_script:
+    - echo "Testing $IMAGE_NAME:$IMAGE_TAG"
+    - docker run -d --name $APP_NAME-$CI_JOB_ID -p 8080:8080 $IMAGE_NAME:$IMAGE_TAG
+  script:
+    - curl --fail http://localhost:8080/ping && echo "✅ Reachable"
+  after_script:
+    - docker rm -f $APP_NAME-$CI_JOB_ID
+
+.deploy:
+  stage: deploy
+  variables:
+    VERSION: 1
+  script:
+    - echo "Deploying $APP_NAME V$VERSION with image $IMAGE_NAME:$IMAGE_TAG ($IMAGE_DEPLOY_TAG)"
+    - helm upgrade $APP_NAME-v$VERSION ./helm/booking-service --set image.tag=$IMAGE_DEPLOY_TAG --values ./helm/booking-service/values-v$VERSION.yaml
+
+publish-image:
+  stage: deploy
+  script:
+    - minikube image load $IMAGE_NAME:$IMAGE_DEPLOY_TAG --overwrite=true
+
+deploy-v1:
+  extends: .deploy
+  variables:
+    VERSION: 1
+  needs:
+    - job: publish-image
+
+deploy-v2:
+  extends: .deploy
+  variables:
+    VERSION: 2
+  needs:
+    - job: publish-image
+
+# tag:
+#   stage: tag
+#  script:
+#    - TAG_NAME=$(date +%s)
+#    - git tag -a $TAG_NAME -m "$APP_NAME released $TAG_NAME"
+ 
