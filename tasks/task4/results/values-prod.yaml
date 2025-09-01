@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 3
 
 image:
   name: booking-service
@@ -11,7 +11,7 @@ service:
   targetPort: 8080
 
 env:
-  ENABLE_FEATURE_X: "true"
+  ENABLE_FEATURE_X: "false"
 
 resources:
 
@@ -22,5 +22,4 @@ livenessProbe:
 readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 5
-    
 

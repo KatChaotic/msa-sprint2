@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   name: booking-service
-  tag: latest
+  tag: staging
   pullPolicy: IfNotPresent
 
 service:
@@ -17,10 +17,9 @@ resources:
 
 livenessProbe:
   initialDelaySeconds: 3
-  periodSeconds: 5
+  periodSeconds: 30
 
 readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 5
-    
 
