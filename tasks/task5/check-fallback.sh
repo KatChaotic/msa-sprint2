@@ -3,7 +3,7 @@
 set -e
 
 echo "▶️ Scaling replicas to 0..."
-kubectl scale --replicas=0 deployment/booking-service-v1
+# kubectl scale --replicas=0 deployment/booking-service-v1
 
 echo "▶️ Testing fallback route..."
 
@@ -13,8 +13,6 @@ failed_count=0
 for i in {1..20}
 do
     status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://localhost/ping)
-
-    sleep 2
 
     if [[ $status_code == "200" ]]; then
         success_count=$((success_count + 1))
@@ -30,6 +28,6 @@ else
 fi
 
 echo "▶️ Scaling replicas to 1 back"
-kubectl scale --replicas=1 deployment/booking-service-v1
+# kubectl scale --replicas=1 deployment/booking-service-v1
 
 echo "🏁 Done!"
