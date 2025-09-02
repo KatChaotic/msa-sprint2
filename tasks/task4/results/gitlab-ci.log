@@ -1,0 +1,38 @@
+build  starting shell (build)
+build  $ echo "Building $IMAGE_NAME:$IMAGE_TAG"
+build  > Building booking-service:latest
+build  $ docker build -t $IMAGE_NAME:$IMAGE_TAG ./booking-service
+build  finished in 2.2 s
+test   starting shell (test)
+test   $ echo "Testing $IMAGE_NAME:$IMAGE_TAG"
+test   > Testing booking-service:latest
+test   $ docker run -d --name $APP_NAME-$CI_JOB_ID -p 8080:8080 $IMAGE_NAME:$IMAGE_TAG
+test   > 1618a0448cab38cb83f0d48a78012b4b048813c93f0fc5bc21e7da89f49399e1
+test   $ curl --fail http://localhost:8080/ping && echo "✅ Reachable"
+test   > pong✅ Reachable
+test   Running after script...
+test   $ docker rm -f $APP_NAME-$CI_JOB_ID
+test   > booking-service-457277
+test   finished in 1.59 s
+deploy starting shell (deploy)
+deploy $ echo "Deploying $IMAGE_NAME:$IMAGE_TAG"
+deploy > Deploying booking-service:latest
+deploy $ minikube image load $IMAGE_NAME:$IMAGE_TAG
+deploy $ helm upgrade $APP_NAME ./helm/booking-service
+deploy > Release "booking-service" has been upgraded. Happy Helming!
+deploy > NAME: booking-service
+deploy > LAST DEPLOYED: Mon Sep  1 18:25:35 2025
+deploy > NAMESPACE: default
+deploy > STATUS: deployed
+deploy > REVISION: 9
+deploy > TEST SUITE: None
+deploy finished in 6.98 s
+tag    starting shell (tag)
+tag    $ TAG_NAME=$(date +%s)
+tag    $ git tag -a $TAG_NAME -m "$APP_NAME released $TAG_NAME"
+tag    finished in 150 ms
+
+ PASS  build 
+ PASS  test  
+ PASS  deploy
+ PASS  tag   

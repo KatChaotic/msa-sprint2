@@ -1,0 +1,13 @@
+{
+    "cSpell.language": "en,ru",
+    "cSpell.words": [
+        "hotelio"
+    ],
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+    },
+    "eslint.codeActionsOnSave.mode": "all",
+    "files.eol": "\n",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+}

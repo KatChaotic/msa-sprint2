@@ -1,0 +1,25 @@
+replicaCount: 3
+
+image:
+  name: booking-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+env:
+  ENABLE_FEATURE_X: "false"
+
+resources:
+
+livenessProbe:
+  initialDelaySeconds: 3
+  periodSeconds: 5
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+

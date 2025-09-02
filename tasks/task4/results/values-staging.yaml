@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  name: booking-service
+  tag: staging
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+env:
+  ENABLE_FEATURE_X: "true"
+
+resources:
+
+livenessProbe:
+  initialDelaySeconds: 3
+  periodSeconds: 30
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5
+

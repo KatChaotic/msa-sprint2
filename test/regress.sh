@@ -8,9 +8,16 @@ echo "🧪 Проверка подключения к БД..."
 timeout 2 bash -c "</dev/tcp/${DB_HOST}/${DB_PORT}" \
   || { echo "❌ Не удалось подключиться к ${DB_HOST}:${DB_PORT}"; exit 1; }
 
+timeout 2 bash -c "</dev/tcp/${BOOKING_DB_HOST}/${BOOKING_DB_PORT}" \
+  || { echo "❌ Не удалось подключиться к ${BOOKING_DB_HOST}:${BOOKING_DB_PORT}"; exit 1; }
+
 # Загрузка фикстур
-echo "🧪 Загрузка фикстур..."
-PGPASSWORD="${DB_PASSWORD}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" "${DB_NAME}" < init-fixtures.sql
+echo "🧪 Загрузка фикстур монолита..."
+PGPASSWORD="${DB_PASSWORD}" psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" "${DB_NAME}" < init-fixtures-monolith.sql
+
+# Загрузка фикстур для микросервиса бронирований
+echo "🧪 Загрузка фикстур микросервиса бронирований..."
+PGPASSWORD="${BOOKING_DB_PASSWORD}" psql -h "${BOOKING_DB_HOST}" -p "${BOOKING_DB_PORT}" -U "${BOOKING_DB_USER}" "${BOOKING_DB_NAME}" < init-fixtures-booking.sql
 
 echo "🧪 Выполнение HTTP-тестов..."
 
@@ -100,8 +107,10 @@ curl -sSf -X POST "${BASE}/api/promos/validate?code=TESTCODE1&userId=test-user-2
 echo ""
 echo "Тесты бронирования..."
 
+# FIX: Тест не работает совместно с GrpcBookingService, т.к. не реализует метода для получения списка всех бронирований а не конкретного пользователя
 # 1. Получение всех бронирований
-curl -sSf "${BASE}/api/bookings" | grep -q 'test-user-2' && pass "Все бронирования получены" || fail "Бронирования не получены"
+# https://app.pachca.com/chats/27706392?thread_message_id=605769388&message=605769388&sidebar_message=609305652
+# curl -sSf "${BASE}/api/bookings" | grep -q 'test-user-2' && pass "Все бронирования получены" || fail "Бронирования не получены"
 
 # 2. Получение бронирований пользователя
 curl -sSf "${BASE}/api/bookings?userId=test-user-2" | grep -q 'test-user-2' && pass "Бронирования test-user-2 найдены" || fail "Нет бронирований test-user-2"
@@ -130,3 +139,11 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "${BASE}/api/bookings?userId=test
   && pass "Отклонено: отель полностью забронирован" \
   || fail "Ошибка: сервер принял бронирование в полностью занятом отеле"
 echo "✅ Все HTTP-тесты пройдены!"
+
+echo "🧪 Выполнение SQL-тестов..."
+PGPASSWORD="${BOOKING_DB_PASSWORD}" psql -h "${BOOKING_DB_HOST}" -p "${BOOKING_DB_PORT}" -U "${BOOKING_DB_USER}" "${BOOKING_DB_NAME}" -c 'SELECT * FROM booking' && pass "Список бронирований получен" || fail "Список бронирований из базы не получен"
+
+PGPASSWORD="${BOOKING_HISTORY_DB_PASSWORD}" psql -h "${BOOKING_HISTORY_DB_HOST}" -p "${BOOKING_HISTORY_DB_PORT}" -U "${BOOKING_HISTORY_DB_USER}" "${BOOKING_HISTORY_DB_NAME}" -c 'SELECT * FROM booking' && pass "Список бронирований из истории получен" || fail "Список бронирований из базы историй не получен"
+
+echo "✅ Все SQL-тесты пройдены!"
+

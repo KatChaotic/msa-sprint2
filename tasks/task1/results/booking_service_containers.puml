@@ -1,0 +1,36 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Ext(bff, "Back For Frontend")
+
+ComponentQueue_Ext(event_bus, "Шина Событий")
+
+Container_Ext(users_service, "Users Service")
+Container_Ext(review_service, "Review Service")
+Container_Ext(hotels_service, "Hotels Service")
+
+Container_Boundary(booking_service, "Booking Service") {
+    Container(BookingAPI, "BookingApi", "", "Предоставляет данные о бронировании")
+
+    Container(BookingProcessorService, "BookingProcessorService", "", "Обрабатывает заявку на бронирование")
+
+    ComponentDb(BookingDB, "BookingDB", "PostgresSQL", "Хранение данных бронирования")
+    ComponentDb(cache_db, "Cache DB", "redis", "Кеширование данных о отелях/пользователях")
+}
+
+Rel(bff, BookingAPI, "Использует", "Rest")
+Rel(BookingAPI, event_bus, "Бронирование")
+
+BiRel(event_bus, BookingProcessorService, "Бронирование/События")
+
+Rel(BookingAPI, BookingDB, "Использует")
+Rel(BookingProcessorService, BookingDB, "Использует")
+
+Rel(BookingProcessorService, cache_db, "Использует")
+
+Rel(BookingProcessorService, users_service, "Использует", "Rest")
+Rel(BookingProcessorService, review_service, "Использует", "Rest")
+Rel(BookingProcessorService, hotels_service, "Использует", "Rest")
+
+@enduml

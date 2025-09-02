@@ -1,0 +1,27 @@
+# Global settings
+global:
+  appName: booking-service
+  namespace: default
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+# Default version configuration (can be overridden by version-specific values)
+version:
+  replicaCount: 1
+  image:
+    name: booking-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  labels: {}
+  env: []
+
+livenessProbe:
+  initialDelaySeconds: 3
+  periodSeconds: 5
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 5

@@ -1,0 +1,69 @@
+@startuml Booking Service
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Ext(bff, "Back For Frontend")
+
+ComponentQueue_Ext(event_bus, "Шина Событий")
+
+Container_Ext(users_service, "Users Service")
+Container_Ext(review_service, "Review Service")
+Container_Ext(hotels_service, "Hotels Service")
+
+Container_Boundary(BookingAPI, "BookingApi") {
+    Component(BookingController, "BookingController", "", "Принимает запросы")
+
+    Component(BookingRepository, "BookingRepository", "", "Работает с базой данных")
+
+    Component(TaskPublisher, "TaskPublisher", "", "Публикует события и задачи в очередь")
+}
+
+Container_Boundary(BookingProcessorService, "BookingProcessorService") {
+    Component(BookingProcessorService_TaskListener, "TaskListener", "", "Принимает задачи бронирования из очереди")
+
+    Component(BookingProcessorService_BookingHandler, "BookingHandler", "", "Обрабатывает логику бронирования")
+
+    Component(BookingProcessorService_BookingRepository, "BookingRepository", "", "Работает с базой данных")
+
+    Component(BookingProcessorService_PromoResultsReader, "PromoResultsReader", "", "Читает результаты применения промокодов из очереди")
+
+    Component(BookingProcessorService_HttpClient, "HttpClient", "", "Обеспечивает запросы и их кеширование на зависимые сервисы")
+
+    Component(BookingProcessorService_EventPublisher, "EventPublisher", "", "Публикует события в очередь")
+}
+
+ComponentDb(BookingDB, "BookingDB", "PostgresSQL", "Хранение данных бронирования")
+ComponentDb(cache_db, "Cache DB", "redis", "Кеширование данных о отелях/пользователях")
+
+' Booking API
+
+Rel(bff, BookingController, "Использует", "Rest")
+Rel(BookingController, TaskPublisher, "Использует")
+Rel(BookingController, BookingRepository, "Использует")
+
+Rel(TaskPublisher, event_bus, "Задачи бронирования")
+Rel(BookingRepository, BookingDB, "Использует")
+
+' BookingProcessorService
+
+Rel(event_bus, BookingProcessorService_TaskListener, "Задачи бронирования")
+Rel(BookingProcessorService_TaskListener, BookingProcessorService_BookingHandler, "Использует")
+
+Rel(BookingProcessorService_BookingHandler, BookingProcessorService_BookingRepository, "Использует")
+Rel(BookingProcessorService_BookingHandler, BookingProcessorService_HttpClient, "Использует")
+Rel(BookingProcessorService_BookingHandler, BookingProcessorService_EventPublisher, "Использует")
+Rel(BookingProcessorService_BookingHandler, BookingProcessorService_PromoResultsReader, "Использует")
+
+Rel(BookingProcessorService_HttpClient, users_service, "Использует", "Rest")
+Rel(BookingProcessorService_HttpClient, review_service, "Использует", "Rest")
+Rel(BookingProcessorService_HttpClient, hotels_service, "Использует", "Rest")
+
+Rel(BookingProcessorService_HttpClient, cache_db, "Использует")
+
+Rel(BookingProcessorService_PromoResultsReader, event_bus, "Читает")
+
+Rel(BookingProcessorService_BookingRepository, BookingDB, "Использует")
+
+Rel(BookingProcessorService_EventPublisher, event_bus, "Публикует")
+
+@enduml

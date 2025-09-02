@@ -2,6 +2,7 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { buildSubgraphSchema } from '@apollo/subgraph';
 import gql from 'graphql-tag';
+import { getHotelById } from './hotelService.js';
 
 const typeDefs = gql`
   type Hotel @key(fields: "id") {
@@ -16,15 +17,44 @@ const typeDefs = gql`
   }
 `;
 
+function convertIdToName(id) {
+  return id.replace(/[-]+/g, ' ')
+    .split(' ')
+    .map(word => {
+      if (word.length === 1) {
+        return word;
+      }
+
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(' ');
+}
+
+function mapHotelApiModelToGraphQl(hotel) {
+  return {
+    id: hotel.id,
+    name: hotel.name ?? convertIdToName(hotel.id),
+    city: hotel.city,
+    stars: Math.floor(hotel.rating),
+  };
+}
+
 const resolvers = {
   Hotel: {
     __resolveReference: async ({ id }) => {
-      // TODO: Реальный вызов к hotel-сервису или заглушка
+      const hotel = await getHotelById(id);
+      if (!hotel) {
+        return null;
+      }
+
+      return mapHotelApiModelToGraphQl(hotel);
     },
   },
   Query: {
     hotelsByIds: async (_, { ids }) => {
-      // TODO: Заглушка или REST-запрос
+      const hotels = await Promise.all(ids.map(id => getHotelById(id)));
+
+      return hotels.filter(Boolean).map(mapHotelApiModelToGraphQl);
     },
   },
 };

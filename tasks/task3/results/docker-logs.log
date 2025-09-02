@@ -1,0 +1,17 @@
+hotel-subgraph-1    | Enabling inline tracing for this subgraph. To disable, use ApolloServerPluginInlineTraceDisabled.
+booking-subgraph-1  | Enabling inline tracing for this subgraph. To disable, use ApolloServerPluginInlineTraceDisabled.
+apollo-gateway-1    | The `serviceList` option is deprecated and will be removed in a future version of `@apollo/gateway`. Please migrate to its replacement `IntrospectAndCompose`. More information on `IntrospectAndCompose` can be found in the documentation.
+hotel-subgraph-1    | ✅ Hotel subgraph ready at http://localhost:4002/
+booking-subgraph-1  | ✅ Booking subgraph ready at http://localhost:4001/
+apollo-gateway-1    | 🚀 Gateway ready at http://localhost:4000/
+booking-subgraph-1  | [BookingService] getBookingsByUserId test-user-3
+booking-subgraph-1  | User test-user-2 is not authenticated to access bookings for user test-user-3
+booking-subgraph-1  | [BookingService] getBookingsByUserId test-user-2
+booking-subgraph-1  | User test-user-3 is not authenticated to access bookings for user test-user-2
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-1
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-1
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-1
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-1
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-1
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-1
+hotel-subgraph-1    | [HotelService] getHotelById test-hotel-2
