@@ -29,30 +29,18 @@ test:
   after_script:
     - docker rm -f $APP_NAME-$CI_JOB_ID
 
-.deploy:
-  stage: deploy
-  variables:
-    VERSION: 1
-  script:
-    - echo "Deploying $APP_NAME V$VERSION with image $IMAGE_NAME:$IMAGE_TAG ($IMAGE_DEPLOY_TAG)"
-    - helm upgrade $APP_NAME-v$VERSION ./helm/booking-service --set image.tag=$IMAGE_DEPLOY_TAG --values ./helm/booking-service/values-v$VERSION.yaml
-
 publish-image:
   stage: deploy
   script:
     - minikube image load $IMAGE_NAME:$IMAGE_DEPLOY_TAG --overwrite=true
 
-deploy-v1:
-  extends: .deploy
+deploy:
+  stage: deploy
   variables:
     VERSION: 1
-  needs:
-    - job: publish-image
-
-deploy-v2:
-  extends: .deploy
-  variables:
-    VERSION: 2
+  script:
+    - echo "Deploying $APP_NAME with image $IMAGE_NAME:$IMAGE_TAG ($IMAGE_DEPLOY_TAG)"
+    - helm upgrade $APP_NAME ./helm/booking-service --set v1.image.tag=$IMAGE_DEPLOY_TAG --set v2.image.tag=$IMAGE_DEPLOY_TAG -f ./helm/booking-service/values-v1.yaml -f ./helm/booking-service/values-v2.yaml
   needs:
     - job: publish-image
 

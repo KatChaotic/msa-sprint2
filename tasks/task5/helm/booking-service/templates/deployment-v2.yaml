@@ -1,32 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Values.global.appName }}-{{ .Values.v2.labels.version }}
   labels:
-    release: {{ .Release.Name }}
-    app: {{ .Values.appName }}
-    version: {{ .Values.version }}
+    release: {{ .Values.global.appName }}-{{ .Values.v2.labels.version }}
+    app: {{ .Values.global.appName }}
+    version: {{ .Values.v2.labels.version }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.v2.replicaCount }}
   selector:
     matchLabels:
-      release: {{ .Release.Name }}
+      release: {{ .Values.global.appName }}-{{ .Values.v2.labels.version }}
   template:
     metadata:
       labels:
-        release: {{ .Release.Name }}
-        app: {{ .Values.appName }}
-        version: {{ .Values.version }}
+        release: {{ .Values.global.appName }}-{{ .Values.v2.labels.version }}
+        app: {{ .Values.global.appName }}
+        version: {{ .Values.v2.labels.version }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.v2.image.name }}:{{ .Values.v2.image.tag }}"
           imagePullPolicy: Never
+          {{- if .Values.v2.env }}
           env:
-            - name: ENABLE_FEATURE_X
-              value: "{{ .Values.env.ENABLE_FEATURE_X }}"
-            - name: PONG_STRING
-              value: "{{ .Values.env.PONG_STRING }}"
+            {{- toYaml .Values.v2.env | nindent 12 }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
           livenessProbe:

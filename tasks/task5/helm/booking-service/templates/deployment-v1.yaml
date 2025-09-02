@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.appName }}-{{ .Values.v1.labels.version }}
+  labels:
+    release: {{ .Values.global.appName }}-{{ .Values.v1.labels.version }}
+    app: {{ .Values.global.appName }}
+    version: {{ .Values.v1.labels.version }}
+spec:
+  replicas: {{ .Values.v1.replicaCount }}
+  selector:
+    matchLabels:
+      release: {{ .Values.global.appName }}-{{ .Values.v1.labels.version }}
+  template:
+    metadata:
+      labels:
+        release: {{ .Values.global.appName }}-{{ .Values.v1.labels.version }}
+        app: {{ .Values.global.appName }}
+        version: {{ .Values.v1.labels.version }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.v1.image.name }}:{{ .Values.v1.image.tag }}"
+          imagePullPolicy: Never
+          {{- if .Values.v1.env }}
+          env:
+            {{- toYaml .Values.v1.env | nindent 12 }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}

@@ -1,29 +1,12 @@
-replicaCount: 1
-appName: booking-service
-version: v1
-
-image:
-  name: booking-service
-  tag: latest
-  pullPolicy: IfNotPresent
-
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 8080
-
-env:
-  ENABLE_FEATURE_X: "false"
-  PONG_STRING: "pong-v1"
-
-resources:
-
-livenessProbe:
-  initialDelaySeconds: 3
-  periodSeconds: 5
-
-readinessProbe:
-  initialDelaySeconds: 5
-  periodSeconds: 5
-    
-
+# Version 1 specific configuration
+v1:
+  replicaCount: 1
+  image:
+    name: booking-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  labels:
+    version: v1
+  env:
+    - name: PONG_STRING
+      value: "pong-v1"
